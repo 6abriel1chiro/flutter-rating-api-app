@@ -36,6 +36,35 @@ class _PostsPageState extends State<PostsPage> {
     }
   }
 
+  Future<void> _showRatingDialog(Post post) async {
+    double? rating = await showDialog<double>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Rate this post'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: List.generate(
+              5,
+              (index) => ListTile(
+                title: Text('${index + 1} stars'),
+                onTap: () {
+                  Navigator.of(context).pop(index + 1);
+                },
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    if (rating != null) {
+      setState(() {
+        post.rating = rating;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,15 +74,25 @@ class _PostsPageState extends State<PostsPage> {
       body: ListView.builder(
         itemCount: posts.length,
         itemBuilder: (context, index) {
+          final post = posts[index];
           return ListTile(
-            title: Text(posts[index].title),
-            subtitle: Text(posts[index].body),
+            subtitle: Text(post.body),
             trailing: IconButton(
-              icon: const Icon(Icons.star_border),
+              icon: Icon(Icons.star_border),
               onPressed: () {
-                // Implement star rating functionality
-                // You can add your logic here to handle the star rating
+                _showRatingDialog(post);
               },
+            ),
+            // Display the rating if available
+            // If not rated yet, display "Not Rated"
+            // You can customize this part based on your design
+            // This is just a simple example
+            // Displaying the rating in the title itself
+            // to avoid the duplicate named argument issue
+            title: Text(
+              post.rating != null
+                  ? '${post.title} - ${post.rating} stars'
+                  : post.title,
             ),
           );
         },
@@ -67,12 +106,14 @@ class Post {
   final int id;
   final String title;
   final String body;
+  double? rating;
 
   Post({
     required this.userId,
     required this.id,
     required this.title,
     required this.body,
+    this.rating,
   });
 
   factory Post.fromJson(Map<String, dynamic> json) {
