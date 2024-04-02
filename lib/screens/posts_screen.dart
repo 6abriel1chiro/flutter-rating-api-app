@@ -78,7 +78,7 @@ class _PostsPageState extends State<PostsPage> {
           return ListTile(
             subtitle: Text(post.body),
             trailing: IconButton(
-              icon: Icon(Icons.star_border),
+              icon: const Icon(Icons.star_border),
               onPressed: () {
                 _showRatingDialog(post);
               },
